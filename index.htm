@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detectives del Patio - Edición Patio Realista</title>
+    <title>Detectives del Patio - Simulación Realista</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; user-select: none; }
         
@@ -30,43 +30,49 @@
             font-weight: bold; 
             border-bottom: 4px solid #4CAF50;
             z-index: 5;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
         }
         .danger { color: #ff4d4d; animation: blink 0.8s infinite; }
 
-        /* ESCENARIO PATIO CON PROFUNDIDAD */
+        /* ESCENARIO PATIO CON PERSPECTIVA CORREGIDA */
         #escenario { 
             width: 100%; 
             max-width: 480px; 
             height: 75vh; 
-            /* Cielo al fondo con degradado de tarde/mañana */
-            background: linear-gradient(to bottom, #87CEEB, #e0f7fa); 
+            background: linear-gradient(to bottom, #7ec0ee, #e0f7fa); 
             position: relative; 
             overflow: hidden; 
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.2);
         }
 
-        /* Barda de bloques con textura lineal */
+        /* Barda del fondo */
         #barda {
             position: absolute;
-            top: 25%; left: 0; width: 100%; height: 50%;
-            background: #90a4ae; 
-            background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
-            background-size: 40px 20px;
-            border-top: 8px solid #78909c;
-            border-bottom: 12px solid #546e7a;
+            top: 0; left: 0; width: 100%; height: 55%;
+            background: #b0bec5; 
+            background-image: linear-gradient(rgba(0,0,0,0.08) 2px, transparent 2px),
+                              linear-gradient(90deg, rgba(0,0,0,0.08) 2px, transparent 2px);
+            background-size: 60px 30px;
+            border-bottom: 16px solid #90a4ae;
         }
 
-        /* Suelo de cemento con perspectiva */
+        /* Piso de cemento realista */
         #suelo {
             position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 25%;
-            background: linear-gradient(to bottom, #757575, #424242);
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.3);
+            bottom: 0; left: 0; width: 100%; height: 45%;
+            background: linear-gradient(to bottom, #9e9e9e, #616161);
+            box-shadow: inset 0 8px 15px rgba(0,0,0,0.4);
         }
 
-        /* Efecto pantalla roja por error */
+        /* Línea de horizonte o junta del piso */
+        #linea-piso {
+            position: absolute;
+            top: 55%; left: 0; width: 100%; height: 4px;
+            background: #424242;
+            opacity: 0.3;
+        }
+
+        /* Efecto visual de error */
         #flash-error {
             position: absolute;
             top:0; left:0; width:100%; height:100%;
@@ -77,7 +83,7 @@
             z-index: 4;
         }
 
-        /* CONTENEDOR BASE DE OBJETOS VECTORIALES */
+        /* CLASE CONTENEDORA BASE PARA TODOS LOS ELEMENTOS */
         .objeto { 
             position: absolute; 
             cursor: pointer; 
@@ -87,45 +93,43 @@
         .objeto svg {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
         }
         .objeto:active { transform: scale(0.85); }
 
-        /* UBICACIONES Y TAMAÑOS EN EL PATIO */
-        #tambo { bottom: 16%; left: 4%; width: 75px; height: 100px; }
-        #lavadero { bottom: 20%; left: 24%; width: 90px; height: 90px; }
-        #cubeta { bottom: 4%; left: 45%; width: 55px; height: 60px; }
-        #bebedero { bottom: 2%; left: 68%; width: 55px; height: 35px; }
-        #maceta { bottom: 15%; right: 4%; width: 65px; height: 80px; }
-        #llanta { bottom: 6%; right: 22%; width: 75px; height: 65px; }
-
-        /* DISTRACTORES */
-        #escoba { bottom: 22%; left: 42%; width: 30px; height: 95px; }
-        #silla { bottom: 14%; right: 42%; width: 55px; height: 80px; }
-        #caja { bottom: 5%; left: 18%; width: 50px; height: 45px; }
-
-        /* MECÁNICAS Y ANIMACIONES DE LAS 4 PALABRAS */
-        .resuelto { pointer-events: none; }
+        /* --- ACOMODO INTEGRADO Y REALISTA DEL PATIO --- */
         
-        /* TAPA: El tambo cambia de color y muestra un borde verde de éxito */
-        .tambo-tapado { filter: drop-shadow(0 0 12px #4CAF50) !important; }
-        /* TIRA: La llanta sale disparada de la pantalla simulando que va al camión */
-        .llanta-tirada { transform: translateY(-700px) rotate(450deg) scale(0.1) !important; opacity: 0; }
-        /* VOLTEA: La cubeta gira de cabeza al instante */
-        .cubeta-volteada { transform: rotate(180deg) translateY(-10px) !important; filter: drop-shadow(0 -4px 6px rgba(0,0,0,0.2)); }
-        /* LAVA: Destello cian de limpieza */
-        .lavado-esponja { filter: brightness(1.2) drop-shadow(0 0 15px #00bcd4); animation: pulso 0.5s ease; }
+        /* Fila del Fondo (Recargados en la barda) */
+        #tambo { bottom: 35%; left: 5%; width: 85px; height: 110px; filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.4)); }
+        #lavadero { bottom: 34%; left: 30%; width: 100px; height: 100px; filter: drop-shadow(5px 5px 6px rgba(0,0,0,0.3)); }
+        #llanta { bottom: 38%; right: 4%; width: 85px; height: 85px; filter: drop-shadow(-4px 4px 5px rgba(0,0,0,0.4)); }
+        
+        /* Fila del Medio / Frente (Dispersos en el suelo de cemento) */
+        #cubeta { bottom: 12%; left: 42%; width: 60px; height: 65px; filter: drop-shadow(2px 6px 6px rgba(0,0,0,0.4)); }
+        #bebedero { bottom: 4%; left: 70%; width: 60px; height: 38px; filter: drop-shadow(1px 4px 4px rgba(0,0,0,0.4)); }
+        #maceta { bottom: 10%; right: 28%; width: 70px; height: 90px; filter: drop-shadow(-3px 5px 6px rgba(0,0,0,0.4)); }
 
-        /* Mosquitos animados */
+        /* Ubicación de los Distractores */
+        #escoba { bottom: 36%; left: 24%; width: 30px; height: 100px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3)); }
+        #silla { bottom: 16%; left: 12%; width: 65px; height: 90px; filter: drop-shadow(4px 6px 6px rgba(0,0,0,0.4)); }
+        #caja { bottom: 6%; left: 52%; width: 55px; height: 50px; filter: drop-shadow(3px 5px 5px rgba(0,0,0,0.4)); }
+
+        /* ESTADOS DE RESOLUCIÓN (MECÁNICAS) */
+        .resuelto { pointer-events: none; }
+        .tambo-tapado { filter: drop-shadow(0 0 15px #4CAF50) !important; }
+        .llanta-tirada { transform: translateY(-750px) rotate(540deg) scale(0) !important; opacity: 0; }
+        .cubeta-volteada { transform: rotate(180deg) translateY(-12px) !important; filter: drop-shadow(0 -5px 6px rgba(0,0,0,0.3)); }
+        .lavado-esponja { filter: brightness(1.25) drop-shadow(0 0 15px #00bcd4); animation: pulso 0.5s ease; }
+
+        /* DISEO MEJORADO DE MOSQUITOS DILECCIONALES */
         .mosquito {
             position: absolute;
-            width: 22px; height: 22px;
+            width: 28px; height: 24px;
             pointer-events: none;
             z-index: 3;
-            transition: left 0.8s linear, top 0.8s linear;
+            transition: left 0.8s ease-in-out, top 0.8s ease-in-out;
         }
 
-        /* Pantalla Final */
+        /* Pantalla de Fin de Juego */
         #pantalla-final { 
             display: none; 
             position: fixed; 
@@ -146,7 +150,7 @@
         .btn-reiniciar { background: #424242; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        @keyframes pulso { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        @keyframes pulso { 0% { transform: scale(1); } 50% { transform: scale(1.18); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -158,72 +162,83 @@
 
     <div id="escenario">
         <div id="barda"></div>
+        <div id="linea-piso"></div>
         <div id="suelo"></div>
         <div id="flash-error"></div>
 
         <div id="tambo" class="objeto" onclick="resolver('tambo', 'tapa')">
             <svg viewBox="0 0 64 64" id="svg-tambo">
                 <ellipse cx="32" cy="12" rx="20" ry="6" fill="#0d47a1"/>
-                <path d="M12,12 C12,12 12,52 32,52 C52,52 52,12 52,12" fill="#1565c0"/>
-                <ellipse cx="32" cy="12" rx="16" ry="4" fill="#0a2540"/>
+                <path d="M12,12 C12,12 12,54 32,54 C52,54 52,12 52,12" fill="#1565c0"/>
+                <ellipse cx="32" cy="12" rx="16" ry="4" fill="#0d47a1" stroke="#0a2540" stroke-width="1"/>
+                <path d="M12,24 Q32,28 52,24 M12,38 Q32,42 52,38" fill="none" stroke="#0d47a1" stroke-width="2"/>
             </svg>
         </div>
 
         <div id="lavadero" class="objeto" onclick="resolver('lavadero', 'lava')">
             <svg viewBox="0 0 64 64">
-                <rect x="8" y="16" width="48" height="24" rx="4" fill="#cfd8dc"/>
-                <rect x="14" y="22" width="20" height="12" fill="#b0bec5"/>
-                <rect x="38" y="22" width="12" height="12" fill="#78909c"/>
-                <path d="M24,8 L24,16 M22,8 L26,8" stroke="#90a4ae" stroke-width="3" stroke-linecap="round"/>
+                <rect x="6" y="16" width="52" height="26" rx="3" fill="#b0bec5"/>
+                <rect x="12" y="22" width="22" height="14" fill="#78909c"/>
+                <line x1="16" y1="26" x2="30" y2="26" stroke="#546e7a" stroke-width="2"/>
+                <line x1="16" y1="30" x2="30" y2="30" stroke="#546e7a" stroke-width="2"/>
+                <rect x="38" y="22" width="14" height="14" fill="#cfd8dc"/>
+                <path d="M45,8 L45,16 M42,8 L48,8" stroke="#78909c" stroke-width="3" stroke-linecap="round"/>
+                <rect x="6" y="42" width="6" height="20" fill="#78909c"/>
+                <rect x="52" y="42" width="6" height="20" fill="#78909c"/>
             </svg>
+        </div>
+
+        <div id="llanta" class="objeto" onclick="resolver('llanta', 'tira')">
+            <svg viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="#212121"/>
+                <circle cx="32" cy="32" r="16" fill="#757575"/> 
+                <circle cx="32" cy="32" r="22" fill="none" stroke="#111" stroke-width="3" stroke-dasharray="5,3"/>
+                <path d="M20,38 Q32,46 44,38" fill="none" stroke="#00b0ff" stroke-width="4" stroke-linecap="round"/> </svg>
         </div>
 
         <div id="cubeta" class="objeto" onclick="resolver('cubeta', 'voltea')">
             <svg viewBox="0 0 64 64">
-                <path d="M16,16 L48,16 L42,52 L22,52 Z" fill="#78909c"/>
-                <ellipse cx="32" cy="16" rx="16" ry="4" fill="#4f5b62"/>
-                <ellipse cx="32" cy="16" rx="14" ry="3" fill="#00b0ff"/> </svg>
+                <path d="M14,12 L50,12 L44,56 L20,56 Z" fill="#b0bec5"/>
+                <ellipse cx="32" cy="12" rx="18" ry="4" fill="#90a4ae"/>
+                <ellipse cx="32" cy="13" rx="16" ry="3" fill="#29b6f6"/> <path d="M12,12 Q32,2 52,12" fill="none" stroke="#546e7a" stroke-width="2"/>
+            </svg>
         </div>
 
         <div id="bebedero" class="objeto" onclick="resolver('bebedero', 'lava')">
             <svg viewBox="0 0 64 64">
-                <path d="M8,44 C8,28 56,28 56,44 Z" fill="#e53935"/>
-                <ellipse cx="32" cy="36" rx="16" ry="5" fill="#00b0ff"/>
+                <path d="M4,48 Q4,24 32,24 Q60,24 60,48 Z" fill="#e53935"/>
+                <ellipse cx="32" cy="34" rx="20" ry="6" fill="#0288d1"/>
+                <ellipse cx="32" cy="33" rx="17" ry="4" fill="#29b6f6"/>
             </svg>
         </div>
 
         <div id="maceta" class="objeto" onclick="resolver('maceta', 'lava')">
             <svg viewBox="0 0 64 64">
-                <path d="M20,12 Q32,0 44,12 Q48,24 32,32 Q16,24 20,12 Z" fill="#4caf50"/> <path d="M16,32 L48,32 L42,56 L22,56 Z" fill="#ff9800"/> <rect x="14" y="56" width="36" height="4" rx="2" fill="#d84315"/> </svg>
-        </div>
-
-        <div id="llanta" class="objeto" onclick="resolver('llanta', 'tira')">
-            <svg viewBox="0 0 64 64">
-                <circle cx="32" cy="32" r="26" fill="#37474f"/>
-                <circle cx="32" cy="32" r="14" fill="#e0f2f1"/> <circle cx="32" cy="32" r="20" fill="none" stroke="#263238" stroke-width="3" stroke-dasharray="6,4"/>
-            </svg>
+                <path d="M32,4 C15,4 12,28 32,32 C52,28 49,4 32,4 Z" fill="#2e7d32"/> <path d="M18,30 L46,30 L40,58 L24,58 Z" fill="#d84315"/> <rect x="14" y="58" width="36" height="4" rx="2" fill="#bf360c"/> <rect x="16" y="57" width="32" height="2" fill="#29b6f6"/> </svg>
         </div>
 
         <div id="escoba" class="objeto" onclick="errorMecanica()">
             <svg viewBox="0 0 64 64">
-                <rect x="30" y="4" width="4" height="44" rx="2" fill="#ffb74d"/>
-                <path d="M16,48 L48,48 L44,60 L20,60 Z" fill="#f4511e"/>
+                <rect x="30" y="2" width="4" height="46" rx="1" fill="#d7ccc8"/>
+                <path d="M14,48 L50,48 L46,62 L18,62 Z" fill="#ffb300"/>
+                <line x1="14" y1="54" x2="50" y2="54" stroke="#ff6f00" stroke-width="2"/>
             </svg>
         </div>
 
         <div id="silla" class="objeto" onclick="errorMecanica()">
             <svg viewBox="0 0 64 64">
-                <path d="M16,16 L16,40 L48,40 L48,16" fill="none" stroke="#d84315" stroke-width="4"/>
-                <rect x="12" y="40" width="40" height="4" fill="#bf360c"/>
-                <rect x="16" y="44" width="4" height="16" fill="#d84315"/>
-                <rect x="44" y="44" width="4" height="16" fill="#d84315"/>
+                <path d="M18,12 L18,36 L46,36 L46,12" fill="none" stroke="#ffb74d" stroke-width="4"/>
+                <rect x="14" y="36" width="36" height="5" rx="1" fill="#ffa000"/>
+                <line x1="18" y1="41" x2="14" y2="62" stroke="#ffb74d" stroke-width="4"/>
+                <line x1="46" y1="41" x2="50" y2="62" stroke="#ffb74d" stroke-width="4"/>
             </svg>
         </div>
 
         <div id="caja" class="objeto" onclick="errorMecanica()">
             <svg viewBox="0 0 64 64">
-                <rect x="10" y="16" width="44" height="36" rx="2" fill="#bcaaa4"/>
-                <path d="M10,16 L32,28 L54,16" fill="none" stroke="#8d6e63" stroke-width="3"/>
+                <rect x="8" y="14" width="48" height="38" rx="2" fill="#bcaaa4"/>
+                <polygon points="8,14 32,26 56,14 32,6" fill="#a1887f" opacity="0.6"/>
+                <line x1="32" y1="26" x2="32" y2="52" stroke="#8d6e63" stroke-width="2"/>
             </svg>
         </div>
     </div>
@@ -253,19 +268,29 @@
             }
         }, 1000);
 
-        // Mosquitos vectoriales volando (Hechos con mini-SVG dinámicos)
+        // Mosquitos interactivos mejorados (Vectores reales detallados)
         const patio = document.getElementById('escenario');
         const moscas = [];
         for (let i = 0; i < 6; i++) {
             let m = document.createElement('div');
             m.className = 'mosquito';
-            m.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="#000"/><path d="M6,10 Q12,2 11,12 M18,10 Q12,2 13,12" fill="#81d4fa" opacity="0.7"/></svg>`;
+            m.innerHTML = `
+                <svg viewBox="0 0 32 32">
+                    <ellipse cx="10" cy="10" rx="7" ry="3" fill="#b3e5fc" opacity="0.7" transform="rotate(-30 10 10)"/>
+                    <ellipse cx="22" cy="10" rx="7" ry="3" fill="#b3e5fc" opacity="0.7" transform="rotate(30 22 10)"/>
+                    <path d="M12,18 L6,22 M20,18 L26,22 M13,22 L8,28 M19,22 L24,28" stroke="#111" stroke-width="1.5"/>
+                    <ellipse cx="16" cy="16" rx="3" ry="6" fill="#212121"/>
+                    <circle cx="14" cy="11" r="1" fill="#ff1744"/>
+                    <circle cx="18" cy="11" r="1" fill="#ff1744"/>
+                </svg>
+            `;
             m.style.left = Math.random() * 80 + '%';
             m.style.top = Math.random() * 50 + '%';
             patio.appendChild(m);
             moscas.push(m);
         }
 
+        // Simulación de vuelo errático
         setInterval(() => {
             if (juegoTerminado) return;
             moscas.forEach(m => {
@@ -274,7 +299,7 @@
             });
         }, 800);
 
-        // Acción Point & Click aplicando la regla de prevención
+        // Lógica de interacción limpia (Las 4 palabras)
         function resolver(id, accion) {
             if (juegoTerminado) return;
             let obj = document.getElementById(id);
@@ -286,11 +311,12 @@
 
             if (accion === 'tapa') {
                 obj.classList.add('tambo-tapado');
-                // Modifica el SVG del tambo para ponerle una tapa lona verde encima
+                // Se coloca lona/tapa hermética verde con cincho seguro
                 document.getElementById('svg-tambo').innerHTML = `
-                    <ellipse cx="32" cy="12" rx="22" ry="7" fill="#2e7d32"/>
-                    <path d="M12,12 C12,12 12,52 32,52 C52,52 52,12 52,12" fill="#1565c0" opacity="0.6"/>
-                    <text x="20" y="38" fill="#4CAF50" font-size="26" font-weight="bold">✓</text>
+                    <path d="M10,10 L54,10 L50,16 L14,16 Z" fill="#2e7d32"/>
+                    <rect x="10" y="14" width="44" height="3" fill="#1b5e20"/>
+                    <path d="M12,16 C12,16 12,54 32,54 C52,54 52,16 52,16" fill="#1565c0" opacity="0.5"/>
+                    <text x="22" y="38" fill="#4CAF50" font-size="22" font-weight="bold">✓</text>
                 `;
             } else if (accion === 'tira') {
                 obj.classList.add('llanta-tirada');
@@ -303,7 +329,7 @@
             if (aciertos === totalCriaderos) finalizarJuego(true);
         }
 
-        // Penalizaciones por distractores
+        // Evento de fallas mecánicas por distractores
         function errorMecanica() {
             if (juegoTerminado) return;
             tiempo = Math.max(0, tiempo - 5);
@@ -313,10 +339,10 @@
                 let ctx = new (window.AudioContext || window.webkitAudioContext)();
                 let osc = ctx.createOscillator();
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, ctx.currentTime);
+                osc.frequency.setValueAtTime(105, ctx.currentTime);
                 osc.connect(ctx.destination);
                 osc.start();
-                osc.stop(ctx.currentTime + 0.12);
+                osc.stop(ctx.currentTime + 0.13);
             } catch(e) {}
 
             let flash = document.getElementById('flash-error');
@@ -324,7 +350,7 @@
             setTimeout(() => { flash.style.opacity = "0"; }, 120);
         }
 
-        // Cierre Psicológico Directo
+        // Cierre psicológico del juego
         function finalizarJuego(gano) {
             juegoTerminado = true;
             clearInterval(countdown);
@@ -339,11 +365,11 @@
             if (gano) {
                 titulo.innerText = "🏆 ¡Felicidades, eres un Detective del Patio!";
                 titulo.style.color = "#4CAF50";
-                mensaje.innerText = `Encontraste y desactivaste los 6 criaderos en ${tiempoEmpleado} segundos. En la vida real, este recorrido te toma solo 10 minutos el fin de semana. Mantén a tu familia a salvo del dengue.`;
+                mensaje.innerText = `Encontraste los 6 criaderos en ${tiempoEmpleado} segundos. En la vida real, este recorrido te toma solo 10 minutos el fin de semana. Mantén a tu familia a salvo del dengue.`;
             } else {
                 titulo.innerText = "❌ El tiempo terminó";
                 titulo.style.color = "#ff4d4d";
-                mensaje.innerText = "Te faltó revisar bien el patio. Recuerda: bastan unas gotas de agua estancada limpia para que el mosquito ponga sus huevos. En la vida real, un solo descuido pone en riesgo a tus hijos o padres.";
+                mensaje.innerText = "Te faltó revisar bien el patio. Recuerda: bastan unas gotas de agua limpia estancada para que el mosquito ponga sus huevos. En la vida real, un solo descuido pone en riesgo a tus hijos o padres.";
             }
 
             let textoWhatsApp = encodeURIComponent(`Acabo de limpiar mi patio virtual en ${tiempoEmpleado}s en el juego del Dengue y protegí a mi familia. ¿Tú qué tan limpio tienes tu patio? Juega aquí: ${window.location.href}`);
