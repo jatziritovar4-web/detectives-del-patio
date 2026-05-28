@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detectives del Patio - Edición Realista</title>
+    <title>Cazadores de Criaderos - Edición Animada</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; user-select: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; user-select: none; }
         
         body { 
-            background: #121212; 
+            background: #1e251f; 
             color: #fff; 
             display: flex; 
             flex-direction: column; 
@@ -18,128 +18,138 @@
             overflow: hidden; 
         }
         
-        /* HUD Estilo App Moderna */
+        /* HUD Superior */
         #hud { 
             width: 100%; 
             max-width: 450px; 
-            padding: 15px 20px; 
+            padding: 15px; 
             display: flex; 
             justify-content: space-between; 
-            background: rgba(30, 30, 30, 0.9); 
-            font-size: 1.1rem; 
+            background: #2e3830; 
+            font-size: 1.2rem; 
             font-weight: bold; 
-            border-bottom: 4px solid #2e7d32;
-            box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+            border-bottom: 4px solid #4CAF50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             z-index: 5;
         }
-        .danger { color: #d32f2f; animation: blink 0.8s infinite; }
+        .danger { color: #ff4d4d; animation: blink 0.8s infinite; }
 
-        /* El Patio Real (Contenedor) */
+        /* Escenario del Patio (Ilustración estilo Vector/Dibujo de patio típico) */
         #escenario { 
             width: 100%; 
             max-width: 450px; 
             height: 75vh; 
-            /* AQUÍ VA TU FOTO DE FONDO: Puedes cambiar este enlace por la foto de un patio real */
-            background: url('https://images.unsplash.com/photo-1590012314607-cda9d9b6a9a9?q=80&w=600') center center / cover no-repeat; 
+            /* Fondo de patio plano / Ilustración limpia */
+            background: #e0f2f1; 
             position: relative; 
             overflow: hidden; 
-            box-shadow: 0px 10px 30px rgba(0,0,0,0.7);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            border-bottom: 16px solid #8d6e63; /* Suelo rústico de dibujo */
+        }
+
+        /* Pared del patio dibujada (barda) */
+        #barda {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 70%;
+            background: #b0bec5; /* Muro gris de block */
+            border-bottom: 8px solid #78909c;
         }
 
         /* Capa de Flash Rojo para Errores */
         #flash-error {
             position: absolute;
             top:0; left:0; width:100%; height:100%;
-            background: rgba(211, 47, 47, 0.4);
+            background: rgba(244, 67, 54, 0.4);
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.15s ease;
+            transition: opacity 0.1s ease;
             z-index: 4;
         }
 
-        /* Objetos con Imágenes Reales (.png transparentes) */
+        /* Objetos Estilo Dibujo / Vector */
         .objeto { 
             position: absolute; 
             cursor: pointer; 
-            transition: transform 0.2s ease, opacity 0.5s ease;
+            transition: transform 0.3s ease, opacity 0.4s ease;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: bottom center;
             z-index: 2;
         }
-        .objeto:active { transform: scale(0.95); }
+        .objeto:active { transform: scale(0.9); }
 
-        /* Colocación de Criaderos (Simulados con imágenes reales de internet) */
+        /* Criaderos en formato Dibujo (Usando íconos vectoriales limpios) */
         #tambo { 
-            bottom: 18%; left: 8%; width: 90px; height: 130px; 
-            background-image: url('https://img.icons8.com/plasticine/200/barrel.png'); /* Reemplazar por tambo azul real */
+            bottom: 12%; left: 8%; width: 85px; height: 120px; 
+            background-image: url('https://img.icons8.com/flat-round/200/water-barrel.png'); 
         }
         #llanta { 
-            bottom: 5%; right: 5%; width: 110px; height: 80px; 
-            background-image: url('https://img.icons8.com/plasticine/200/tyre.png'); /* Reemplazar por llanta sucia real */
+            bottom: 3%; right: 6%; width: 100px; height: 70px; 
+            background-image: url('https://img.icons8.com/flat-round/200/car-wheel.png'); 
+            filter: grayscale(30%);
         }
         #cubeta { 
-            bottom: 8%; left: 42%; width: 70px; height: 85px; 
-            background-image: url('https://img.icons8.com/plasticine/200/bucket.png'); /* Reemplazar por cubeta con agua */
+            bottom: 4%; left: 40%; width: 70px; height: 80px; 
+            background-image: url('https://img.icons8.com/flat-round/200/bucket.png'); 
         }
 
-        /* Distractores Reales */
+        /* Distractores de Dibujo */
         #escoba { 
-            bottom: 15%; right: 40%; width: 45px; height: 145px; 
-            background-image: url('https://img.icons8.com/plasticine/200/broom.png'); 
+            bottom: 18%; right: 42%; width: 45px; height: 130px; 
+            background-image: url('https://img.icons8.com/flat-round/200/broom.png'); 
         }
 
-        /* Efectos Visuales de "Desactivación" */
+        /* Efectos de la regla de las 4 palabras */
         .resuelto { pointer-events: none; }
-        
-        /* Animación: El tambo ahora se le nota una tapa encima */
-        .tambo-tapado { 
-            filter: drop-shadow(0px 0px 10px #4CAF50);
-        }
-        /* Animación: La llanta sale volando hacia el camión */
-        .llanta-eliminada { 
-            transform: translateY(-600px) rotate(180deg) scale(0.1) !important; 
-            opacity: 0; 
-        }
-        /* Animación: La cubeta se gira por completo */
-        .cubeta-volteada { 
-            transform: rotate(150deg) translateY(30px) !important; 
-            filter: grayscale(50%);
+        .tambo-tapado { filter: drop-shadow(0 0 10px #4CAF50); }
+        .llanta-tirada { transform: translateY(-700px) rotate(270deg) scale(0.2) !important; opacity: 0; }
+        .cubeta-volteada { transform: rotate(180deg) translateY(-20px) !important; }
+
+        /* Los Mosquitos Volando (Dibujos CSS) */
+        .mosquito {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            background-image: url('https://img.icons8.com/color/96/mosquito.png'); /* Dibujo de mosquito */
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none; /* No estorban al hacer clic en los objetos */
+            z-index: 3;
+            transition: left 1s linear, top 1s linear; /* Movimiento suave */
         }
 
-        /* Pantalla de Resultados Elegante */
+        /* Pantalla Final Directa y Madura */
         #pantalla-final { 
             display: none; 
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(10, 10, 10, 0.98); 
+            background: rgba(18, 24, 19, 0.96); 
             z-index: 10; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            padding: 30px; 
+            padding: 25px; 
             text-align: center; 
         }
-        #pantalla-final h2 { font-size: 2.2rem; margin-bottom: 15px; font-weight: 800; }
-        #mensaje { font-size: 1.1rem; margin-bottom: 35px; line-height: 1.6; max-width: 380px; color: #ccc; }
+        #pantalla-final h2 { font-size: 2rem; margin-bottom: 15px; font-weight: bold; }
+        #mensaje { font-size: 1.1rem; margin-bottom: 30px; line-height: 1.5; max-width: 380px; color: #e0e0e0; }
         
-        /* Botones Acción Colectiva */
-        .btn { padding: 16px 32px; font-size: 1.05rem; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; text-decoration: none; color: white; margin: 8px; width: 85%; max-width: 320px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
-        .btn-wa { background: #128C7E; transition: background 0.3s; }
-        .btn-wa:hover { background: #25D366; }
-        .btn-reiniciar { background: #333; color: #eee; }
+        .btn { padding: 16px 32px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; text-decoration: none; color: white; margin: 8px; width: 85%; max-width: 320px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+        .btn-wa { background: #25D366; }
+        .btn-reiniciar { background: #424242; }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     </style>
 </head>
 <body>
 
     <div id="hud">
         <div>⏱️ <span id="timer">60</span>s</div>
-        <div>🪰 Criaderos: <span id="contador">0</span> / 3</div>
+        <div>🦟 Criaderos: <span id="contador">0</span> / 3</div>
     </div>
 
     <div id="escenario">
+        <div id="barda"></div>
         <div id="flash-error"></div>
 
         <div id="tambo" class="objeto" onclick="resolver('tambo')"></div>
@@ -152,7 +162,7 @@
     <div id="pantalla-final">
         <h2 id="resultado-titulo"></h2>
         <p id="mensaje"></p>
-        <a id="btn-share" class="btn btn-wa" href="#" target="_blank">Retar a mis vecinos en WhatsApp 💬</a>
+        <a id="btn-share" class="btn btn-wa" href="#" target="_blank">Retar a vecinos en WhatsApp 💬</a>
         <button class="btn btn-reiniciar" onclick="location.reload()">Jugar de nuevo 🔄</button>
     </div>
 
@@ -162,6 +172,7 @@
         const totalCriaderos = 3;
         let juegoTerminado = false;
 
+        // Iniciar reloj
         const countdown = setInterval(() => {
             if (juegoTerminado) return;
             tiempo--;
@@ -173,6 +184,33 @@
             }
         }, 1000);
 
+        // Crear los mosquitos voladores
+        const escenario = document.getElementById('escenario');
+        const numMosquitos = 6;
+        const listaMosquitos = [];
+
+        for (let i = 0; i < numMosquitos; i++) {
+            let mosca = document.createElement('div');
+            mosca.className = 'mosquito';
+            // Posición inicial aleatoria
+            mosca.style.left = Math.random() * 80 + '%';
+            mosca.style.top = Math.random() * 60 + '%';
+            escenario.appendChild(mosca);
+            listaMosquitos.push(mosca);
+        }
+
+        // Mover los mosquitos de dibujo por el patio cada segundo
+        setInterval(() => {
+            if (juegoTerminado) return;
+            listaMosquitos.forEach(mosca => {
+                let x = Math.random() * 85;
+                let y = Math.random() * 65;
+                mosca.style.left = x + '%';
+                mosca.style.top = y + '%';
+            });
+        }, 1000);
+
+        // Lógica al tocar un criadero verdadero
         function resolver(id) {
             if (juegoTerminado) return;
             let obj = document.getElementById(id);
@@ -182,13 +220,11 @@
             aciertos++;
             document.getElementById('contador').innerText = aciertos;
 
-            // Cambios físicos realistas
             if (id === 'tambo') {
                 obj.classList.add('tambo-tapado');
-                // Simulamos que le cae una tapa encima cambiando la imagen
-                obj.style.backgroundImage = "url('https://img.icons8.com/plasticine/200/checked-checkbox.png')"; 
+                obj.style.backgroundImage = "url('https://img.icons8.com/flat-round/200/checkmark.png')"; // Icono de tapado/ok
             } else if (id === 'llanta') {
-                obj.classList.add('llanta-eliminada');
+                obj.classList.add('llanta-tirada');
             } else if (id === 'cubeta') {
                 obj.classList.add('cubeta-volteada');
             }
@@ -196,6 +232,7 @@
             if (aciertos === totalCriaderos) finalizarJuego(true);
         }
 
+        // Lógica al tocar un distractor (Silla/Escoba)
         function errorMecanica() {
             if (juegoTerminado) return;
             tiempo = Math.max(0, tiempo - 5);
@@ -203,13 +240,16 @@
             
             let flash = document.getElementById('flash-error');
             flash.style.opacity = "1";
-            setTimeout(() => { flash.style.opacity = "0"; }, 150);
+            setTimeout(() => { flash.style.opacity = "0"; }, 100);
         }
 
         function finalizarJuego(gano) {
             juegoTerminado = true;
             clearInterval(countdown);
             
+            // Quitar los mosquitos al ganar/perder
+            document.querySelectorAll('.mosquito').forEach(m => m.remove());
+
             const pantalla = document.getElementById('pantalla-final');
             const titulo = document.getElementById('resultado-titulo');
             const mensaje = document.getElementById('mensaje');
@@ -217,16 +257,16 @@
             let tiempoEmpleado = 60 - tiempo;
 
             if (gano) {
-                titulo.innerText = "🏆 ¡Excelente Inspector!";
+                titulo.innerText = "🏆 ¡Felicidades, Detective!";
                 titulo.style.color = "#81c784";
-                mensaje.innerText = `Limpiaste el patio en ${tiempoEmpleado} segundos. En la vida real, eliminar estos criaderos te toma menos de 10 minutos a la semana. ¡Protege a tu familia del dengue!`;
+                mensaje.innerText = `Encontraste y eliminaste los criaderos en ${tiempoEmpleado} segundos. En la vida real, este recorrido te toma solo 10 minutos el fin de semana. Mantén a tu familia a salvo del dengue.`;
             } else {
-                titulo.innerText = "❌ El tiempo expiró";
+                titulo.innerText = "❌ El tiempo terminó";
                 titulo.style.color = "#e57373";
-                mensaje.innerText = "Te faltaron lugares críticos por revisar. Recuerda que el mosquito del dengue busca cualquier agua estancada limpia para reproducirse.";
+                mensaje.innerText = "Te faltó revisar objetos. Recuerda: bastan unas gotas de agua estancada para que el mosquito ponga sus huevos. En la vida real, un solo descuido pone en riesgo a tus hijos o padres.";
             }
 
-            let textoWhatsApp = encodeURIComponent(`Acabo de limpiar mi patio virtual contra el Dengue en ${tiempoEmpleado}s. ¿Tú qué tan limpio tienes el tuyo? Rétame aquí: ${window.location.href}`);
+            let textoWhatsApp = encodeURIComponent(`¡Acabo de limpiar mi patio virtual del Dengue en ${tiempoEmpleado} segundos! ¿Tú qué tan limpio tienes tu patio? Juega aquí: ${window.location.href}`);
             btnShare.href = `https://api.whatsapp.com/send?text=${textoWhatsApp}`;
             pantalla.style.display = "flex";
         }
